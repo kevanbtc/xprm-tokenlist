@@ -1,0 +1,16 @@
+{
+  "name": "XRPrime Token List",
+  "timestamp": "2025-08-15T00:00:00Z",
+  "tokens": [
+    {
+      "chainId": 137,
+      "address": "0xCFf20c4498Ec58946c59eAE86A7E3841D6a0E5f2",
+      "name": "XRPrime",
+      "symbol": "XPRM",
+      "decimals": 18,
+      "logoURI": "./logo.svg",
+      "tags": ["community"]
+    }
+  ],
+  "version": { "major": 1, "minor": 0, "patch": 0 }
+}
