@@ -1,0 +1,109 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Add XRPrime (XPRM)</title>
+  <style>
+    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;display:grid;place-items:center;min-height:100vh;background:#0b1020;color:#fff;margin:0;padding:24px}
+    .card{max-width:680px;width:100%;background:#101733;border:1px solid #223055;border-radius:16px;box-shadow:0 10px 30px rgba(0,0,0,.35);padding:24px}
+    h1{margin:0 0 10px}
+    .muted{opacity:.8;margin-top:6px}
+    .row{display:flex;gap:12px;flex-wrap:wrap;margin-top:18px}
+    button{cursor:pointer;border:0;border-radius:12px;padding:14px 16px;font-weight:700;background:#5b8cff;color:#fff;transition:.15s}
+    button.secondary{background:#2a3358}
+    button:disabled{opacity:.55;cursor:not-allowed}
+    code,a{color:#9cd3ff}
+    .grid{display:grid;grid-template-columns:1fr;gap:14px;margin-top:18px}
+    @media(min-width:640px){.grid{grid-template-columns:1fr 1fr}}
+    .box{background:#0d142b;border:1px solid #223055;border-radius:12px;padding:14px}
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>XRPrime (XPRM)</h1>
+    <div class="muted">Polygon • Contract: <code id="addr"></code></div>
+
+    <div class="row" style="margin-top:16px">
+      <button id="btnAddNet">➕ Add Polygon to MetaMask</button>
+      <button id="btnAddToken">⭐ Add XPRM to MetaMask</button>
+      <a class="muted" target="_blank" rel="noopener" href="./xrprime.tokenlist.json">
+        View token list JSON
+      </a>
+    </div>
+
+    <div class="grid">
+      <div class="box">
+        <strong>QuickSwap – import list</strong><br/>
+        Open QuickSwap, go to Settings → Token Lists → “Add list” and paste:<br/>
+        <code id="listUrl"></code>
+      </div>
+      <div class="box">
+        <strong>Contract on PolygonScan</strong><br/>
+        <a id="scan" target="_blank" rel="noopener">View on PolygonScan</a>
+      </div>
+    </div>
+
+    <p class="muted">Tip: after adding the list, searching “XPRM” should show XRPrime with the logo.</p>
+  </div>
+
+<script>
+const ADDR   = "0xCFf20c4498Ec58946c59eAE86A7E3841D6a0E5f2";
+const SYMBOL = "XPRM";
+const NAME   = "XRPrime";
+const DECIMALS = 18;
+const CHAIN_ID = 137;
+
+const RPC_URL  = "https://polygon-rpc.com";
+const SCAN_URL = "https://polygonscan.com";
+
+const listUrl  = location.origin + location.pathname.replace(/\/(?:index\.html)?$/, "/") + "../xrprime.tokenlist.json";
+
+document.getElementById("addr").textContent = ADDR;
+document.getElementById("listUrl").textContent = listUrl;
+document.getElementById("scan").href = `${SCAN_URL}/token/${ADDR}`;
+
+async function addPolygon() {
+  if (!window.ethereum) { alert("Open this page in a browser with MetaMask."); return; }
+  try {
+    await window.ethereum.request({
+      method: "wallet_addEthereumChain",
+      params: [{
+        chainId: "0x89", // 137
+        chainName: "Polygon",
+        nativeCurrency: { name: "POL", symbol: "POL", decimals: 18 },
+        rpcUrls: [RPC_URL],
+        blockExplorerUrls: [SCAN_URL]
+      }]
+    });
+  } catch (e) {
+    console.error(e); alert("Failed to add Polygon: " + (e?.message||e));
+  }
+}
+
+async function addToken() {
+  if (!window.ethereum) { alert("Open this page in a browser with MetaMask."); return; }
+  try {
+    const added = await window.ethereum.request({
+      method: "wallet_watchAsset",
+      params: {
+        type: "ERC20",
+        options: {
+          address: ADDR,
+          symbol: SYMBOL,
+          decimals: DECIMALS,
+          image: location.origin + location.pathname.replace(/\/(?:index\.html)?$/, "/") + "../logo.svg"
+        }
+      }
+    });
+    if (!added) alert("User rejected adding the token.");
+  } catch (e) {
+    console.error(e); alert("Failed to add token: " + (e?.message||e));
+  }
+}
+
+document.getElementById("btnAddNet").onclick = addPolygon;
+document.getElementById("btnAddToken").onclick = addToken;
+</script>
+</body>
+</html>
